@@ -1,0 +1,54 @@
+.qodo
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+__pycache__/
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environment
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Django stuff:
+*.log
+db.sqlite3
+
+# Static files (if generated during build)
+staticfiles/
+
+# Media files (if you want to ignore user-uploaded media)
+media/
+
+# PyCharm
+.idea/
+
+# VSCode
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
