@@ -1,7 +1,11 @@
 # core/views.py
 from django.shortcuts import render
+from django.http import HttpResponse
 import pandas as pd
+import io
+import os
 from . import utils
+from .auto_model import auto_train_and_predict
 
 def home(request):
     return render(request, 'home.html')
@@ -9,27 +13,28 @@ def home(request):
 def predict(request):
     if request.method == 'POST':
         uploaded_file = request.FILES.get('dataset')
-        selected_model = request.POST.get('model')
         if uploaded_file:
-            df = pd.read_csv(uploaded_file)
-            if selected_model:
-                try:
-                    model = utils.load_model(selected_model)
-                    predictions = model.predict(df)
-                    # Add predictions as a new column for display
-                    df['prediction'] = predictions
-                    # Optionally, you can store the results in the session or prepare a downloadable CSV later
-                    return render(request, 'results.html', {
-                        'table': df.head().to_html(classes='table table-striped')
-                    })
-                except Exception as e:
-                    return render(request, 'predict.html', {
-                        'error': f"Error during prediction: {e}"
-                    })
-            else:
-                # If no model is selected, just show the data preview
-                return render(request, 'preview.html', {
-                    'table': df.head().to_html(classes='table table-striped')
-                })
-    # For GET requests, render the upload form with model selection
+            try:
+                # Read CSV file from the upload
+                df = pd.read_csv(uploaded_file)
+            except Exception as e:
+                return render(request, 'predict.html', {'error': f"Error reading file: {e}"})
+            
+            try:
+                # Call the auto-adaptive model training/prediction function
+                context = auto_train_and_predict(df)
+            except Exception as e:
+                return render(request, 'predict.html', {'error': f"Error during model training: {e}"})
+            
+            # Render results with the generated context (table preview, visualizations, etc.)
+            return render(request, 'results.html', context)
     return render(request, 'predict.html')
+
+def download_csv(request):
+    file_path = 'media/predictions.csv'
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="predictions.csv"'
+            return response
+    return HttpResponse("No file found.")

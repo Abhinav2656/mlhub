@@ -1,5 +1,5 @@
 # core/utils.py
-import pickle
+import joblib
 
 def load_model(model_name):
     """
@@ -7,14 +7,11 @@ def load_model(model_name):
     model_name: a string (e.g., 'logistic_model' or 'linear_regression_model')
     """
     model_path = f"ml_models/{model_name}.pkl"
-    with open(model_path, "rb") as f:
-        model = pickle.load(f)
-    return model
+    return joblib.load(model_path)
 
 def run_prediction(model, data):
     """
     Run prediction using the loaded model on the provided DataFrame.
     Returns the predictions.
     """
-    predictions = model.predict(data)
-    return predictions
+    return model.predict(data)
